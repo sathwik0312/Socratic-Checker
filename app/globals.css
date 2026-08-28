@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink text-chalk font-body antialiased;
+  }
+
+  ::selection {
+    @apply bg-brass text-ink;
+  }
+
+  :focus-visible {
+    outline: 2px solid #d4a94a;
+    outline-offset: 3px;
+  }
+
+  textarea,
+  input {
+    @apply bg-slate/60 border border-line text-chalk placeholder:text-mute/60;
+  }
+}
+
+@layer utilities {
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-mute;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
