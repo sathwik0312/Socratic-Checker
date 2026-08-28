@@ -1,6 +1,6 @@
 # Socratic Checker
 
-**Team:** _TEAM MEMBERS — replace before submitting_
+**Team:** Sathwik Marupaka , Nikhil Arethiya
 **Brief:** DevFest DC 2026 Build-a-thon — 4.2 Socratic Checker
 **Live URL:** _paste your Vercel URL here_
 
