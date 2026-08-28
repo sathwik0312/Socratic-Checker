@@ -1,5 +1,12 @@
+import { GoogleGenAI } from "@google/genai";
+
 const MODEL = "gemini-3.6-flash";
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+// vertexai flag comes from GOOGLE_GENAI_USE_VERTEXAI env. apiKey must be
+// passed explicitly here (not left implicit) or the SDK prefers the also-set
+// GOOGLE_CLOUD_PROJECT/LOCATION env vars and falls back to ADC instead of
+// this Vertex AI Express-mode key.
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 /**
  * Gemini occasionally wraps JSON in markdown fences despite the response
@@ -18,35 +25,18 @@ export async function generateJson<T>(
   userPrompt: string,
   temperature = 0.7
 ): Promise<T> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) {
-    throw new Error(
-      "GEMINI_API_KEY is not set. Add it in your environment panel and redeploy."
-    );
-  }
-
-  const res = await fetch(`${ENDPOINT}?key=${key}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        temperature,
-        responseMimeType: "application/json",
-        maxOutputTokens: 2048,
-      },
-    }),
+  const res = await ai.models.generateContent({
+    model: MODEL,
+    contents: userPrompt,
+    config: {
+      systemInstruction: systemPrompt,
+      temperature,
+      responseMimeType: "application/json",
+      maxOutputTokens: 2048,
+    },
   });
 
-  if (!res.ok) {
-    const detail = await res.text();
-    throw new Error(`Gemini returned ${res.status}. ${detail.slice(0, 300)}`);
-  }
-
-  const data = await res.json();
-  const text: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
+  const text = res.text;
   if (!text) {
     throw new Error("Gemini returned no content. Try rephrasing the topic.");
   }
